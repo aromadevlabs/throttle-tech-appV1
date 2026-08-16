@@ -1,0 +1,15 @@
+{
+  "appId": "com.throttletech.app",
+  "appName": "Throttle Tech",
+  "webDir": "dist",
+  "server": {
+    "url": "https://your-deployed-domain.example.com",
+    "cleartext": false
+  },
+  "ios": {
+    "backgroundColor": "#141110"
+  },
+  "android": {
+    "backgroundColor": "#141110"
+  }
+}
