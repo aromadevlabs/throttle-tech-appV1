@@ -1,0 +1,15 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#141110"/>
+  <rect x="16" y="16" width="480" height="480" rx="80" fill="#C1272D"/>
+  <g transform="rotate(-45 256 256)">
+    <!-- bar -->
+    <rect x="150" y="245" width="212" height="22" fill="#EDE7DF"/>
+    <!-- left jaw ring -->
+    <circle cx="170" cy="256" r="45" fill="none" stroke="#EDE7DF" stroke-width="22"/>
+    <!-- right jaw ring -->
+    <circle cx="342" cy="256" r="45" fill="none" stroke="#EDE7DF" stroke-width="22"/>
+    <!-- wedge cutouts to open each jaw outward -->
+    <path d="M170,256 L121.14,294.19 L121.14,217.81 Z" fill="#C1272D"/>
+    <path d="M342,256 L390.86,217.81 L390.86,294.19 Z" fill="#C1272D"/>
+  </g>
+</svg>
