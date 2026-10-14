@@ -4,8 +4,8 @@
   "description": "AI shop assistant for motorcycle repair shops — chat, part ID, job board, and more.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#141110",
-  "theme_color": "#C1272D",
+  "background_color": "#0A0A0A",
+  "theme_color": "#E10600",
   "orientation": "any",
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },

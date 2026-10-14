@@ -3,6 +3,11 @@
 AI shop assistant for motorcycle repair shops — chat, part ID from photos, a shop job board, a
 teardown/reinstall tracker, and shop-based sign-in for multiple locations.
 
+**New in v3:** a redesigned layout (side menu on desktop, bottom tabs on phones), **customer &
+bike records** with service history, **photos on jobs** (before / damage / after), a **parts
+inventory** with low-stock alerts that's tied into jobs and Part Finder, and **hands-free voice
+mode** for asking questions and logging removed parts without touching the screen.
+
 This package gives you three things from one codebase:
 
 1. **Web app** — run it in a browser, host it anywhere Node runs.
@@ -95,8 +100,11 @@ not covered here.)
 
 ## 6. Data storage
 
-All shop data (chats, notes, the part-removal tracker, the job board, and the shop registry)
-lives in `data/kv.json` next to the server — a plain JSON file, no database setup required. This
+All shop data (chats, notes, the part-removal tracker, the job board, customers, inventory, and
+the shop registry) lives in `data/kv.json` next to the server — a plain JSON file, no database
+setup required. Job photos are saved as image files in `data/photos/` (shrunk on the phone to
+roughly 200 KB each before upload). **Back up the whole `data/` folder** — that's your shop's
+records. This
 is fine for two shop locations' worth of traffic. If you ever outgrow it, that file format is
 simple enough to migrate into a real database later.
 
@@ -121,17 +129,28 @@ default in this build is `cjshops`.
   put anything in here you wouldn't want exposed if someone got creative.
 - The `ANTHROPIC_API_KEY` never reaches the browser — it's used only inside `server/index.js`.
   Never commit your real `.env` file.
+- **Before putting this on the public internet:** the server's `/api/claude`, `/api/kv` and
+  `/api/photos` routes don't check who is calling — the shop login and company code are only
+  enforced in the browser. Anyone who finds your URL could use your API key or read/change shop
+  data. Add server-side sign-in (sessions or tokens checked on every API request) before deploying
+  publicly, or keep the server on your shop network / behind a VPN until then.
 
 ## 9. Project structure
 
 ```
 throttle-tech-app/
-├── src/                  # React app (the actual UI, unchanged from the prototype)
-│   ├── App.jsx           # main component
+├── src/
+│   ├── App.jsx           # main component: layout, Shop Board, chat & assistant pages
+│   ├── ui.jsx            # shared design pieces (buttons, cards, inputs, modal, etc.)
+│   ├── features/
+│   │   ├── Customers.jsx # customer & bike records + service history
+│   │   ├── Inventory.jsx # parts inventory + "parts used" on job cards
+│   │   ├── JobPhotos.jsx # before / damage / after photos on jobs
+│   │   └── HandsFree.jsx # full-screen voice mode
 │   ├── storage.js        # replaces window.storage with real backend/localStorage calls
 │   └── main.jsx          # app entry point
 ├── server/
-│   └── index.js          # Express server: Claude API proxy + JSON key/value storage
+│   └── index.js          # Express server: Claude API proxy + JSON storage + photo files
 ├── electron/
 │   └── main.cjs          # Electron desktop wrapper
 ├── public/
@@ -139,8 +158,19 @@ throttle-tech-app/
 │   ├── sw.js              # service worker (installability + basic offline shell)
 │   └── icons/             # app icons
 ├── data/kv.json           # all app data lives here (auto-created on first run)
+├── data/photos/           # job photos (auto-created)
 └── .env                    # your API key (create this — see step 2)
 ```
+
+## 9b. Hands-free voice mode — what to know
+
+- Works in **Chrome, Edge and Safari** (desktop and phone). Firefox and the Electron desktop app
+  don't support voice recognition — there you can still type, and answers are read out loud.
+- The browser asks for microphone permission the first time. Voice recognition needs an internet
+  connection.
+- The site must be served over **HTTPS** (or `localhost`) for the microphone to work on phones.
+- Commands: ask anything · "next" · "repeat" · "stop" · "exit" · "log front axle nut" /
+  "removed front axle nut" (adds it to the Track Assistant list).
 
 ## 10. Going further — the real iOS / Android app path
 

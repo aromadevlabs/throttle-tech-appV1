@@ -7,9 +7,9 @@
     "cleartext": false
   },
   "ios": {
-    "backgroundColor": "#141110"
+    "backgroundColor": "#0A0A0A"
   },
   "android": {
-    "backgroundColor": "#141110"
+    "backgroundColor": "#0A0A0A"
   }
 }

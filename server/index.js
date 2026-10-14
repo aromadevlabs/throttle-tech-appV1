@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import crypto from "crypto";
 
 dotenv.config();
 
@@ -88,6 +89,39 @@ app.delete("/api/kv/:key", (req, res) => {
   const store = readStore();
   delete store[req.params.key];
   writeStore(store);
+  res.json({ deleted: true });
+});
+
+// ---------- Job photos ----------
+// Photos are saved as real image files in data/photos/ (not inside kv.json),
+// so the data file stays small and fast no matter how many photos you take.
+const PHOTO_DIR = path.join(DATA_DIR, "photos");
+if (!fs.existsSync(PHOTO_DIR)) fs.mkdirSync(PHOTO_DIR, { recursive: true });
+const PHOTO_ID_RE = /^[a-f0-9-]{36}\.(jpg|png|webp)$/;
+const PHOTO_TYPES = { jpeg: "jpg", jpg: "jpg", png: "png", webp: "webp" };
+
+app.post("/api/photos", (req, res) => {
+  const match = /^data:image\/(jpeg|jpg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(req.body?.dataUrl || "");
+  if (!match) return res.status(400).json({ error: "Send a JPEG, PNG or WebP image as a data URL." });
+  const buf = Buffer.from(match[2], "base64");
+  if (buf.length > 15 * 1024 * 1024) return res.status(413).json({ error: "Photo is too large." });
+  const id = `${crypto.randomUUID()}.${PHOTO_TYPES[match[1]]}`;
+  fs.writeFileSync(path.join(PHOTO_DIR, id), buf);
+  res.json({ id, url: `/api/photos/${id}` });
+});
+
+app.get("/api/photos/:id", (req, res) => {
+  if (!PHOTO_ID_RE.test(req.params.id)) return res.status(400).end();
+  const file = path.join(PHOTO_DIR, req.params.id);
+  if (!fs.existsSync(file)) return res.status(404).end();
+  res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+  res.sendFile(file);
+});
+
+app.delete("/api/photos/:id", (req, res) => {
+  if (!PHOTO_ID_RE.test(req.params.id)) return res.status(400).end();
+  const file = path.join(PHOTO_DIR, req.params.id);
+  if (fs.existsSync(file)) fs.unlinkSync(file);
   res.json({ deleted: true });
 });
 

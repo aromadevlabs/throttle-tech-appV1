@@ -18,7 +18,7 @@ function createWindow() {
     height: 820,
     minWidth: 380,
     minHeight: 600,
-    backgroundColor: "#141110",
+    backgroundColor: "#0A0A0A",
     title: "Throttle Tech",
     webPreferences: {
       contextIsolation: true,
